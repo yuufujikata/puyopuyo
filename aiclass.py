@@ -62,7 +62,7 @@ class AI():
       if a==1:
         aipuyo.puyooki(i+1)
         aipuyo.rakka(aifield)
-        if aifield.shin_rensashirabe()>=3:
+        if aifield.shin_rensashirabe()>=5:
           return i+1
         if aifield.renketusirabe5(aipuyo):
           continue

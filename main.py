@@ -33,6 +33,8 @@ def main():
           start_c=3
         if event.key==K_d:
           start_c=4
+        if event.key==K_e:
+          start_c=5
     if start_c!=0:
       break
   if start_c==1:
@@ -47,6 +49,9 @@ def main():
   if start_c==4:
     cpu.start()
     cpu2.start()
+  if start_c==5:
+    cpu2.start()
+    karaplayer.start()
 
 
 class Gamen(threading.Thread):
@@ -279,8 +284,8 @@ class CPU2(threading.Thread):
       t1=time.time()
 #     ai.cpu_c=ai.cpu1(field2,puyo_2)
 #     ai.cpu_c=ai.cpu2(field2,puyo_2)
-      ai2.cpu_c=ai2.cpu3(field1,puyo_1)
-#     ai.cpu_c=ai.cpu4(field2,puyo_2)
+#     ai2.cpu_c=ai2.cpu3(field1,puyo_1)
+      ai2.cpu_c=ai2.cpu4(field1,puyo_1)
       t2=time.time()
       if t_kaisuu!=1:
         t_total+=t2-t1
