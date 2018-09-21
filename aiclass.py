@@ -118,7 +118,7 @@ class AI():
       else:
         return 0
     elif x==3:
-      if field.haichi[11][3]!=0:
+      if field.haichi[10][3]!=0:
         return 0
       else:
         return 1
@@ -190,7 +190,7 @@ class AI():
       else:
         return 0
     elif x==9:
-      if field.haichi[11][2]!=0:
+      if field.haichi[10][3]!=0:
         return 0
       elif field.haichi[puyo.puyo2y][3]==0:
         return 1
@@ -440,7 +440,7 @@ class AI():
       else:
         return 0
     elif self.cpu_c==3:
-      if field.haichi[11][3]!=0:
+      if field.haichi[10][3]!=0:
         return 0
       if puyo.puyo2x==3:
         if puyo.puyo2y==puyo.puyo1y-1:
@@ -610,7 +610,7 @@ class AI():
       else:
         return 0
     elif self.cpu_c==9:
-      if field.haichi[11][2]!=0:
+      if field.haichi[10][3]!=0:
         return 0
       if puyo.puyo2x==3:
         if puyo.puyo2y==puyo.puyo1y+1:
