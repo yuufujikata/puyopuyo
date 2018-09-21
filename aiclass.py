@@ -55,6 +55,7 @@ class AI():
   def cpu4(self,field,puyo):
     kekka=np.zeros((3,22),dtype=np.int)
     aipuyo=AIPuyo()
+    t3=0
     for i in range(22):
       aifield=AIField(field)
       aipuyo.syokika(puyo)

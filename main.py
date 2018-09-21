@@ -287,9 +287,10 @@ class CPU2(threading.Thread):
 #     ai2.cpu_c=ai2.cpu3(field1,puyo_1)
       ai2.cpu_c=ai2.cpu4(field1,puyo_1)
       t2=time.time()
-      if t_kaisuu!=1:
-        t_total+=t2-t1
-        print(t_total/t_kaisuu)
+      print(t2-t1)
+#     if t_kaisuu!=1:
+#       t_total+=t2-t1
+#       print(t_total/t_kaisuu)
       while True:
         if syuuryou.syuuryou_c==0:
           pygame.quit()

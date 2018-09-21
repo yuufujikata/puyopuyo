@@ -756,6 +756,26 @@ class AIField(Field):
     self.haichi=copy.deepcopy(y)
     return False
 
+  def renketukeshi2(self):
+    count3=0
+    for j in range(1,13):
+      for i in range(1,7):
+        y=copy.deepcopy(self.haichi)
+        self.count21=0
+        self.count22=0
+        self.count23=0
+        self.count24=0
+        self.renketu2(i,j)
+        if self.count21>=4 or self.count22>=4 or self.count23>=4 or self.count24>=4:
+          count3+=self.count21+self.count22+self.count23+self.count24
+          for l in range(1,13):
+            for k in range(1,7):
+              if self.haichi[l][k]==11 or self.haichi[l][k]==12 or self.haichi[l][k]==13 or self.haichi[l][k]==14 or self.haichi[l][k]==15:
+                self.haichi[l][k]=0
+        else:
+          self.haichi=copy.deepcopy(y)
+    return count3
+
 
   def renketukeshi3(self,i,j):
     y=copy.deepcopy(self.haichi)
@@ -778,7 +798,7 @@ class AIField(Field):
   
   def sokurensa(self):
     j=self.renketukeshi2()
-    if j[0]!=0:
+    if j!=0:
       self.rensa_c+=1
     aa=self.rakka(14)
     if aa==1:
