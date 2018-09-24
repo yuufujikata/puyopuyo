@@ -55,7 +55,6 @@ class AI():
   def cpu4(self,field,puyo):
     kekka=np.zeros((3,22),dtype=np.int)
     aipuyo=AIPuyo()
-    t3=0
     for i in range(22):
       aifield=AIField(field)
       aipuyo.syokika(puyo)
@@ -63,7 +62,7 @@ class AI():
       if a==1:
         aipuyo.puyooki(i+1)
         aipuyo.rakka(aifield)
-        if aifield.shin_rensashirabe()>=5:
+        if aifield.shin_rensashirabe()>=3:
           return i+1
         if aifield.renketusirabe5(aipuyo):
           continue
@@ -118,7 +117,7 @@ class AI():
       else:
         return 0
     elif x==3:
-      if field.haichi[10][3]!=0:
+      if field.haichi[11][3]!=0:
         return 0
       else:
         return 1
@@ -190,7 +189,7 @@ class AI():
       else:
         return 0
     elif x==9:
-      if field.haichi[10][3]!=0:
+      if field.haichi[11][2]!=0:
         return 0
       elif field.haichi[puyo.puyo2y][3]==0:
         return 1
@@ -440,7 +439,7 @@ class AI():
       else:
         return 0
     elif self.cpu_c==3:
-      if field.haichi[10][3]!=0:
+      if field.haichi[11][3]!=0:
         return 0
       if puyo.puyo2x==3:
         if puyo.puyo2y==puyo.puyo1y-1:
@@ -610,7 +609,7 @@ class AI():
       else:
         return 0
     elif self.cpu_c==9:
-      if field.haichi[10][3]!=0:
+      if field.haichi[11][2]!=0:
         return 0
       if puyo.puyo2x==3:
         if puyo.puyo2y==puyo.puyo1y+1:

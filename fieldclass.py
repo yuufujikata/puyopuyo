@@ -756,6 +756,7 @@ class AIField(Field):
     self.haichi=copy.deepcopy(y)
     return False
 
+  #renketukeshi
   def renketukeshi2(self):
     count3=0
     for j in range(1,13):
@@ -773,9 +774,12 @@ class AIField(Field):
               if self.haichi[l][k]==11 or self.haichi[l][k]==12 or self.haichi[l][k]==13 or self.haichi[l][k]==14 or self.haichi[l][k]==15:
                 self.haichi[l][k]=0
         else:
-          self.haichi=copy.deepcopy(y)
-    return count3
+          for l in range(1,13):
+            for k in range(1,7):
+              if self.haichi[l][k]==11 or self.haichi[l][k]==12 or self.haichi[l][k]==13 or self.haichi[l][k]==14 or self.haichi[l][k]==15:
+                self.haichi[l][k]=y[l][k]
 
+    return count3
 
   def renketukeshi3(self,i,j):
     y=copy.deepcopy(self.haichi)
@@ -792,7 +796,13 @@ class AIField(Field):
           if self.haichi[l][k]==11 or self.haichi[l][k]==12 or self.haichi[l][k]==13 or self.haichi[l][k]==14 or self.haichi[l][k]==15:
             self.haichi[l][k]=0
     else:
-      self.haichi=copy.deepcopy(y)
+      for k in range(1,7):
+        for l in range(1,13):
+          if self.haichi[l][k]==0:
+            break
+          if self.haichi[l][k]==11 or self.haichi[l][k]==12 or self.haichi[l][k]==13 or self.haichi[l][k]==14 or self.haichi[l][k]==15:
+            self.haichi[l][k]=y[l][k]
+
     return 1
 
   
