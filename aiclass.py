@@ -62,7 +62,7 @@ class AI():
       if a==1:
         aipuyo.puyooki(i+1)
         aipuyo.rakka(aifield)
-        if aifield.shin_rensashirabe()>=3:
+        if aifield.shin_rensashirabe()>=6:
           return i+1
         if aifield.renketusirabe5(aipuyo):
           continue
@@ -117,7 +117,7 @@ class AI():
       else:
         return 0
     elif x==3:
-      if field.haichi[11][3]!=0:
+      if field.haichi[10][3]!=0:
         return 0
       else:
         return 1
@@ -189,7 +189,7 @@ class AI():
       else:
         return 0
     elif x==9:
-      if field.haichi[11][2]!=0:
+      if field.haichi[10][2]!=0:
         return 0
       elif field.haichi[puyo.puyo2y][3]==0:
         return 1
