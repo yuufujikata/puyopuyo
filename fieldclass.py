@@ -207,6 +207,38 @@ class Field():
       self.haichi[j-1][i]=15
     return 1
  
+  #renketukeshi
+  def renketu3(self,i,j):
+    a=self.haichi[j][i]
+    if a==0 or a==5 or a==15 or a==1 or a==2 or a==3 or a==4 or a==20:
+      return 1
+    if self.haichi[j][i]==11:
+      self.haichi[j][i]=0
+    elif self.haichi[j][i]==12:
+      self.haichi[j][i]=0
+    elif self.haichi[j][i]==13:
+      self.haichi[j][i]=0
+    elif self.haichi[j][i]==14:
+      self.haichi[j][i]=0
+    if a==self.haichi[j][i+1]:
+      self.renketu3(i+1,j)
+    elif self.haichi[j][i+1]==15:
+      self.haichi[j][i+1]=0
+    if a==self.haichi[j][i-1] :
+      self.renketu3(i-1,j)
+    elif self.haichi[j][i-1]==15:
+      self.haichi[j][i-1]=0
+    if j!=12 and j!=13 and j!=14:
+      if a==self.haichi[j+1][i]:
+        self.renketu3(i,j+1)
+      elif self.haichi[j+1][i]==15:
+        self.haichi[j+1][i]=0
+    if a==self.haichi[j-1][i]:
+      self.renketu3(i,j-1)
+    elif self.haichi[j-1][i]==15:
+      self.haichi[j-1][i]=0
+    return 1
+
 
   def renketukeshi(self):
     count3=0
@@ -761,7 +793,8 @@ class AIField(Field):
     count3=0
     for j in range(1,13):
       for i in range(1,7):
-        y=copy.deepcopy(self.haichi)
+        if self.haichi[j][i]==0 or self.haichi[j][i]==11 or self.haichi[j][i]==12 or self.haichi[j][i]==13 or self.haichi[j][i]==14 or self.haichi[j][i]==15:
+          continue
         self.count21=0
         self.count22=0
         self.count23=0
@@ -769,15 +802,19 @@ class AIField(Field):
         self.renketu2(i,j)
         if self.count21>=4 or self.count22>=4 or self.count23>=4 or self.count24>=4:
           count3+=self.count21+self.count22+self.count23+self.count24
-          for l in range(1,13):
-            for k in range(1,7):
-              if self.haichi[l][k]==11 or self.haichi[l][k]==12 or self.haichi[l][k]==13 or self.haichi[l][k]==14 or self.haichi[l][k]==15:
-                self.haichi[l][k]=0
-        else:
-          for l in range(1,13):
-            for k in range(1,7):
-              if self.haichi[l][k]==11 or self.haichi[l][k]==12 or self.haichi[l][k]==13 or self.haichi[l][k]==14 or self.haichi[l][k]==15:
-                self.haichi[l][k]=y[l][k]
+          self.renketu3(i,j)
+    for l in range(1,13):
+      for k in range(1,7):
+        if self.haichi[l][k]==11:
+          self.haichi[l][k]=1
+        elif self.haichi[l][k]==12: 
+          self.haichi[l][k]=2
+        elif self.haichi[l][k]==13:
+          self.haichi[l][k]=3
+        elif self.haichi[l][k]==14:
+          self.haichi[l][k]=4
+        elif self.haichi[l][k]==15:
+          self.haichi[l][k]=5
 
     return count3
 
