@@ -7,11 +7,13 @@ import random
 
 #----self module----
 from puyoclass import Puyo
+from puyoclass import AIPuyo
 from fieldclass import Field
 from tumoclass import Tumo
 from aiclass import AI
 from elseclass import *
 from hyouji import *
+
 
 
 def main():
@@ -35,6 +37,8 @@ def main():
           start_c=4
         if event.key==K_e:
           start_c=5
+        if event.key==K_f:
+          start_c=6
     if start_c!=0:
       break
   if start_c==1:
@@ -42,15 +46,19 @@ def main():
     karaplayer.start()
   if start_c==2:
     player1.start()
-    cpu.start()
+    com_migi.start()
   if start_c==3:
     player1.start()
     player2.start()
   if start_c==4:
-    cpu.start()
-    cpu2.start()
+    com_migi.start()
+    com_hidari.start()
   if start_c==5:
-    cpu2.start()
+    com_hidari.start()
+    karaplayer.start()
+  if start_c==6:
+    com_hidari.start()
+    ai_cpu.start()
     karaplayer.start()
 
 
@@ -201,28 +209,16 @@ class Player2(threading.Thread):
         pygame.quit()
         sys.exit()
 
-class CPU(threading.Thread):
+class COM_MIGI(threading.Thread):
   def __init__(self):
     threading.Thread.__init__(self)
   def run (self):
     clock=pygame.time.Clock()
     puyo_2.syote(tumo)
     time.sleep(2)
-    t_total=0
-    t_kaisuu=0
     while True:
-      t_kaisuu+=1
       field2.haichi_c=1
       puyo_2.syokika2(tumo)
-      t1=time.time()
-#     ai.cpu_c=ai.cpu1(field2,puyo_2)
-#     ai.cpu_c=ai.cpu2(field2,puyo_2)
-#     ai.cpu_c=ai.cpu3(field2,puyo_2)
-      ai.cpu_c=ai.cpu4(field2,puyo_2)
-      t2=time.time()
-      if t_kaisuu!=1:
-        t_total+=t2-t1
-        print(t_total/t_kaisuu)
       while True:
         if syuuryou.syuuryou_c==0:
           pygame.quit()
@@ -268,29 +264,17 @@ class CPU(threading.Thread):
         pygame.quit()
         sys.exit()
 
-class CPU2(threading.Thread):
+class COM_HIDARI(threading.Thread):
   def __init__(self):
     threading.Thread.__init__(self)
   def run (self):
     clock=pygame.time.Clock()
     puyo_1.syote(tumo)
     time.sleep(2)
-    t_total=0
-    t_kaisuu=0
+    puyo_1.hajime_c=0
     while True:
-      t_kaisuu+=1
       field1.haichi_c=1
       puyo_1.syokika(tumo)
-      t1=time.time()
-#     ai.cpu_c=ai.cpu1(field2,puyo_2)
-#     ai.cpu_c=ai.cpu2(field2,puyo_2)
-#     ai2.cpu_c=ai2.cpu3(field1,puyo_1)
-      ai2.cpu_c=ai2.cpu4(field1,puyo_1)
-      t2=time.time()
-#     print(t2-t1)
-      if t_kaisuu!=1:
-        t_total+=t2-t1
-        print(t_total/t_kaisuu)
       while True:
         if syuuryou.syuuryou_c==0:
           pygame.quit()
@@ -299,7 +283,7 @@ class CPU2(threading.Thread):
         puyo_1.surinukecount+=1
         puyo_1.surinukecount2+=1
         puyo_1.kaiten_c=0
-        ai2.cpu_sousa(field1,puyo_1)
+        ai.cpu_sousa(field1,puyo_1)
         puyo_1.yokoidou(field1)
         if puyo_1.shita_c>0:
           idou=puyo_1.idouhantei(field1,3)
@@ -352,6 +336,48 @@ class Karaplayer(threading.Thread):
       if field1.counttotal_a>=70:
         field1.counttotal_a=field2.ojamarakka(field1)
 
+class AI_CPU(threading.Thread):
+  def __init__(self):
+    threading.Thread.__init__(self)
+    return
+  def run(self):
+    sakiyomicpu_c=0
+    kirikae_c=0
+    while True:
+      if kirikae_c==0:
+        karihaichi=copy.deepcopy(field1.haichi)
+        karipuyo=AIPuyo()
+        karipuyo.syokika(puyo_1) 
+        karipuyo.puyooki(ai.cpu_c)
+        karipuyo.rakka(karihaichi)
+        imapuyo=AIPuyo()
+        imapuyo.puyo1iro=puyo_1.nexnex[0]
+        imapuyo.puyo2iro=puyo_1.nexnex[1]
+        if puyo_1.hajime_c==1:
+          imapuyo.puyo1x=3
+          imapuyo.puyo1y=13
+          imapuyo.puyo2x=3
+          imapuyo.puyo2y=12
+        else:
+          imapuyo.puyo1x=puyo_1.puyo1x
+          imapuyo.puyo1y=puyo_1.puyo1y
+          imapuyo.puyo2x=puyo_1.puyo2x
+          imapuyo.puyo2y=puyo_1.puyo2y
+        t1=time.time()
+        sakiyomicpu_c=ai.cpu4(karihaichi,imapuyo)
+        t2=time.time()
+        print(t2-t1)
+        print(sakiyomicpu_c)
+        kirikae_c=1
+      else:
+        if puyo_1.imapuyo_c==0:
+          ai.cpu_c=sakiyomicpu_c
+          kirikae_c=0
+          puyo_1.imapuyo_c=1
+        time.sleep(0.001)
+
+
+
 if __name__=='__main__':
   #object
   syuuryou=Syuuryou()
@@ -366,10 +392,11 @@ if __name__=='__main__':
   
   #player
   player1=Player1()
-  cpu=CPU()
-  cpu2=CPU2()
+  com_migi=COM_MIGI()
+  com_hidari=COM_HIDARI()
   player2=Player2()
   karaplayer=Karaplayer()
+  ai_cpu=AI_CPU()
   
   #hyouji
   gamen=Gamen()

@@ -29,6 +29,8 @@ class Puyo():
     self.n2=tumo.tumosyote[1]
     self.n3=tumo.tumosyote[2]
     self.n4=tumo.tumosyote[3]
+    self.imapuyo_c=1
+    self.hajime_c=1
     return 
 
   def syote(self,tumo):
@@ -71,6 +73,8 @@ class Puyo():
     self.suri=-11
     self.suri2=-11
     self.rakkab_c=0
+    self.imapuyo_c=0
+
     return 
 
   def syokika2(self,tumo):
@@ -407,18 +411,20 @@ class AIPuyo():
       self.puyo2y=13
     return
 
-  def rakka(self,field):
+  def rakka(self,haichi):
+    if self.puyo1iro==0 and self.puyo2iro==0:
+      return
     while True:
-      if field.haichi[self.puyo1y-1][self.puyo1x]!=0 and field.haichi[self.puyo2y-1][self.puyo2x]!=0:
+      if haichi[self.puyo1y-1][self.puyo1x]!=0 and haichi[self.puyo2y-1][self.puyo2x]!=0:
         break
-      elif field.haichi[self.puyo1y-1][self.puyo1x]!=0 and self.puyo1x==self.puyo2x and self.puyo1y==self.puyo2y-1:
+      elif haichi[self.puyo1y-1][self.puyo1x]!=0 and self.puyo1x==self.puyo2x and self.puyo1y==self.puyo2y-1:
         break
-      elif field.haichi[self.puyo2y-1][self.puyo2x]!=0 and self.puyo2x==self.puyo1x and self.puyo2y==self.puyo1y-1:
+      elif haichi[self.puyo2y-1][self.puyo2x]!=0 and self.puyo2x==self.puyo1x and self.puyo2y==self.puyo1y-1:
         break
-      if field.haichi[self.puyo1y-1][self.puyo1x]==0:
+      if haichi[self.puyo1y-1][self.puyo1x]==0:
         self.puyo1y-=1
-      if field.haichi[self.puyo2y-1][self.puyo2x]==0:
+      if haichi[self.puyo2y-1][self.puyo2x]==0:
         self.puyo2y-=1
-    field.haichi[self.puyo1y][self.puyo1x]=self.puyo1iro
-    field.haichi[self.puyo2y][self.puyo2x]=self.puyo2iro
+    haichi[self.puyo1y][self.puyo1x]=self.puyo1iro
+    haichi[self.puyo2y][self.puyo2x]=self.puyo2iro
 

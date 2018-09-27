@@ -41,7 +41,7 @@ class AI():
       a=self.cpu_idouhantei(aifield,aipuyo,i+1)
       if a==1:
         aipuyo.puyooki(i+1)
-        aipuyo.rakka(aifield)
+        aipuyo.rakka(aifield.haichi)
         b=aifield.renketusirabe2(i+1,aipuyo)
         kekka[0][i]=b[0]
         kekka[1][i]=b[1]
@@ -52,17 +52,18 @@ class AI():
     return kekka[1].argmin()+1
    
   #rensa
-  def cpu4(self,field,puyo):
+  def cpu4(self,haichi,puyo):
     kekka=np.zeros((3,22),dtype=np.int)
     aipuyo=AIPuyo()
     for i in range(22):
-      aifield=AIField(field)
+      aifield=AIField(haichi)
       aipuyo.syokika(puyo)
       a=self.cpu_idouhantei(aifield,aipuyo,i+1)
+      print('a',a)
       if a==1:
         aipuyo.puyooki(i+1)
-        aipuyo.rakka(aifield)
-        if aifield.shin_rensashirabe()>=6:
+        aipuyo.rakka(aifield.haichi)
+        if aifield.shin_rensashirabe()>=12:
           return i+1
         if aifield.renketusirabe5(aipuyo):
           continue
@@ -89,18 +90,24 @@ class AI():
     if x==1:
       if field.haichi[13][1]!=0 or field.haichi[13][2]!=0:
         return 0
-      elif field.haichi[puyo.puyo2y][1]==0 and field.haichi[puyo.puyo2y][2]==0:
-        return 1
-      elif field.haichi[puyo.puyo2y-1][puyo.puyo2x]!=0: 
-        return 1
-      elif field.haichi[puyo.puyo2y-1][2]!=0 and field.haichi[puyo.puyo2y][2]==0:
-        return 1
-      elif field.haichi[puyo.puyo2y-1][4]!=0 and field.haichi[puyo.puyo2y][4]==0:
-        return 1
-      elif field.haichi[puyo.puyo2y][2]!=0 and field.haichi[puyo.puyo2y][4]!=0:
-        return 1
-      else: 
+      elif field.haichi[puyo.puyo2y+1][2]!=0:
         return 0
+      elif  field.haichi[puyo.puyo2y][2]!=0:
+        if field.haichi[puyo.puyo2y-1][puyo.puyo2x]!=0: 
+          return 1
+        elif field.haichi[puyo.puyo2y-1][4]!=0 and field.haichi[puyo.puyo2y][4]==0:
+          return 1
+        elif  field.haichi[puyo.puyo2y][4]!=0:
+          return 1
+        else:
+          return 0
+      elif field.haichi[puyo.puyo2y][1]!=0:
+        if field.haichi[puyo.puyo2y-1][2]!=0:
+          return 1
+        else:
+          return 0
+      else: 
+        return 1
     if x==2:
       if field.haichi[13][2]!=0:
         return 0

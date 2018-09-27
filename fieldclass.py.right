@@ -466,8 +466,8 @@ class Field():
 
 class AIField(Field):
 
-  def __init__(self,haichi):
-    self.haichi=copy.deepcopy(haichi)
+  def __init__(self,field):
+    self.haichi=copy.deepcopy(field.haichi)
     self.ojama=[0,0,0,0,0,0]
     self.counttotal=0
     self.counttotal2=0
