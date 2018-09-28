@@ -10,7 +10,7 @@ from puyoclass import Puyo
 from puyoclass import AIPuyo
 from fieldclass import Field
 from tumoclass import Tumo
-from aiclass import AI
+from aiclass import CPU
 from elseclass import *
 from hyouji import *
 
@@ -227,7 +227,7 @@ class COM_MIGI(threading.Thread):
         puyo_2.surinukecount+=1
         puyo_2.surinukecount2+=1
         puyo_2.kaiten_c=0
-        ai.cpu_sousa(field2,puyo_2)
+        cpu.cpu_sousa(field2,puyo_2)
         puyo_2.yokoidou(field2)
         if puyo_2.shita_c>0:
           idou=puyo_2.idouhantei(field2,3)
@@ -283,7 +283,7 @@ class COM_HIDARI(threading.Thread):
         puyo_1.surinukecount+=1
         puyo_1.surinukecount2+=1
         puyo_1.kaiten_c=0
-        ai.cpu_sousa(field1,puyo_1)
+        cpu.cpu_sousa(field1,puyo_1)
         puyo_1.yokoidou(field1)
         if puyo_1.shita_c>0:
           idou=puyo_1.idouhantei(field1,3)
@@ -348,7 +348,7 @@ class AI_CPU(threading.Thread):
         karihaichi=copy.deepcopy(field1.haichi)
         karipuyo=AIPuyo()
         karipuyo.syokika(puyo_1) 
-        karipuyo.puyooki(ai.cpu_c)
+        karipuyo.puyooki(cpu.cpu_c)
         karipuyo.rakka(karihaichi)
         imapuyo=AIPuyo()
         imapuyo.puyo1iro=puyo_1.nexnex[0]
@@ -364,14 +364,13 @@ class AI_CPU(threading.Thread):
           imapuyo.puyo2x=puyo_1.puyo2x
           imapuyo.puyo2y=puyo_1.puyo2y
         t1=time.time()
-        sakiyomicpu_c=ai.cpu4(karihaichi,imapuyo)
+        sakiyomicpu_c=cpu.ai4(karihaichi,imapuyo)
         t2=time.time()
         print(t2-t1)
-        print(sakiyomicpu_c)
         kirikae_c=1
       else:
         if puyo_1.imapuyo_c==0:
-          ai.cpu_c=sakiyomicpu_c
+          cpu.cpu_c=sakiyomicpu_c
           kirikae_c=0
           puyo_1.imapuyo_c=1
         time.sleep(0.001)
@@ -386,8 +385,8 @@ if __name__=='__main__':
   field2=Field()
   puyo_1=Puyo(tumo)
   puyo_2=Puyo(tumo)
-  ai=AI()
-  ai2=AI()
+  cpu=CPU()
+  cpu2=CPU()
   souevent=Event()
   
   #player
