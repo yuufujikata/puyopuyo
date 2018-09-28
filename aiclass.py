@@ -59,10 +59,11 @@ class CPU():
       aifield=AIField(haichi)
       aipuyo.syokika(puyo)
       a=self.cpu_idouhantei(aifield,aipuyo,i+1)
+      print(i+1,a)
       if a==1:
         aipuyo.puyooki(i+1)
         aipuyo.rakka(aifield.haichi)
-        if aifield.shin_rensashirabe()>=8:
+        if aifield.shin_rensashirabe()>=4:
           return i+1
         if aifield.renketusirabe5(aipuyo):
           continue

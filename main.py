@@ -9,6 +9,7 @@ import random
 from puyoclass import Puyo
 from puyoclass import AIPuyo
 from fieldclass import Field
+from fieldclass import AIField
 from tumoclass import Tumo
 from aiclass import CPU
 from elseclass import *
@@ -345,11 +346,12 @@ class AI_CPU(threading.Thread):
     kirikae_c=0
     while True:
       if kirikae_c==0:
-        karihaichi=copy.deepcopy(field1.haichi)
+        karifield=AIField(field1.haichi)
         karipuyo=AIPuyo()
         karipuyo.syokika(puyo_1) 
         karipuyo.puyooki(cpu.cpu_c)
-        karipuyo.rakka(karihaichi)
+        karipuyo.rakka(karifield.haichi)
+        karifield.sokurensa()
         imapuyo=AIPuyo()
         imapuyo.puyo1iro=puyo_1.nexnex[0]
         imapuyo.puyo2iro=puyo_1.nexnex[1]
@@ -364,13 +366,14 @@ class AI_CPU(threading.Thread):
           imapuyo.puyo2x=puyo_1.puyo2x
           imapuyo.puyo2y=puyo_1.puyo2y
         t1=time.time()
-        sakiyomicpu_c=cpu.ai4(karihaichi,imapuyo)
+        sakiyomicpu_c=cpu.ai4(karifield.haichi,imapuyo)
         t2=time.time()
         print(t2-t1)
         kirikae_c=1
       else:
         if puyo_1.imapuyo_c==0:
           cpu.cpu_c=sakiyomicpu_c
+          print(cpu.cpu_c)
           kirikae_c=0
           puyo_1.imapuyo_c=1
         time.sleep(0.001)
