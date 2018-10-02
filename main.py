@@ -40,6 +40,8 @@ def main():
           start_c=5
         if event.key==K_f:
           start_c=6
+        if event.key==K_g:
+          start_c=7
     if start_c!=0:
       break
   if start_c==1:
@@ -60,6 +62,9 @@ def main():
   if start_c==6:
     com_hidari.start()
     ai_cpu.start()
+    karaplayer.start()
+  if start_c==7:
+    com.start()
     karaplayer.start()
 
 
@@ -209,6 +214,81 @@ class Player2(threading.Thread):
         syuuryou.syuuryou_c=0
         pygame.quit()
         sys.exit()
+
+class COM(threading.Thread):
+  def __init__(self):
+    threading.Thread.__init__(self)
+  def run (self):
+    clock=pygame.time.Clock()
+    puyo_1.syote(tumo)
+    time.sleep(2)
+    t_total=0
+    t_kaisuu=0
+    while True:
+      t_kaisuu+=1
+      field1.haichi_c=1
+      puyo_1.syokika(tumo)
+      tugipuyo=AIPuyo()
+      tugipuyo.puyo1iro=puyo_1.nexnex[0]
+      tugipuyo.puyo2iro=puyo_1.nexnex[1]
+      tugipuyo.puyo1x=3
+      tugipuyo.puyo1y=13
+      tugipuyo.puyo2x=3
+      tugipuyo.puyo2y=12 
+      t1=time.time()
+      cpu.cpu_c=cpu.ai5(field1.haichi,puyo_1,tugipuyo)
+      t2=time.time()
+      print(t2-t1)
+      print(cpu.cpu_c)
+#     if t_kaisuu!=1:
+#       t_total+=t2-t1
+#       print(t_total/t_kaisuu)
+      while True:
+        if syuuryou.syuuryou_c==0:
+          pygame.quit()
+          sys.exit()
+        clock.tick(60)
+        puyo_1.surinukecount+=1
+        puyo_1.surinukecount2+=1
+        puyo_1.kaiten_c=0
+        cpu.cpu_sousa(field1,puyo_1)
+        puyo_1.yokoidou(field1)
+        if puyo_1.shita_c>0:
+          idou=puyo_1.idouhantei(field1,3)
+          if idou==1:
+            puyo_1.idou_c+=10
+            puyo_1.rakkab_c+=1
+          elif idou==0:
+            puyo_1.setticount+=50
+        if puyo_1.kaiten_c==1:
+          puyo_1.hidarikaiten(field1)
+        elif puyo_1.kaiten_c==2:
+          puyo_1.migikaiten(field1)
+        break_c=puyo_1.shitaidou(field1)
+        if break_c==1:
+          break
+      time.sleep(0.4)
+      countcheck=field1.counttotal2
+      field1.rensa(field2)
+      field1.counttotal_a+=field1.counttotal
+      field1.counttotal=0
+      field1.rensa_c=0
+      if countcheck!=field1.counttotal2:
+        field1.zenkeshicount=0
+        for i in range(1,14):
+          for j in range(1,7):
+            if field1.haichi[i][j]!=0:
+              field1.zenkeshicount+=1
+        if field1.zenkeshicount==0:
+          field1.zenkeshihyouji=1
+      if field2.counttotal_a>=70:
+        field2.counttotal_a=field1.ojamarakka(field2)
+      if field1.haichi[12][3]!=0 :
+        syuuryou.syuuryou_c=0
+        pygame.quit()
+        sys.exit()
+
+
 
 class COM_MIGI(threading.Thread):
   def __init__(self):
@@ -378,6 +458,48 @@ class AI_CPU(threading.Thread):
           puyo_1.imapuyo_c=1
         time.sleep(0.001)
 
+class AI_CPU2(threading.Thread):
+  def __init__(self):
+    threading.Thread.__init__(self)
+    return
+  def run(self):
+    sakiyomicpu_c=0
+    kirikae_c=0
+    while True:
+      if kirikae_c==0:
+        karifield=AIField(field1.haichi)
+        karipuyo=AIPuyo()
+        karipuyo.syokika(puyo_1) 
+        karipuyo.puyooki(cpu.cpu_c)
+        karipuyo.rakka(karifield.haichi)
+        karifield.sokurensa()
+        imapuyo=AIPuyo()
+        imapuyo2=AIPuyo()
+        imapuyo.puyo1iro=puyo_1.nexnex[0]
+        imapuyo.puyo2iro=puyo_1.nexnex[1]
+        imapuyo2.puyo1iro=puyo_1.nexnex[2]
+        imapuyo2.puyo2iro=puyo_1.nexnex[3]
+        imapuyo.puyo1x=3
+        imapuyo.puyo1y=13
+        imapuyo.puyo2x=3
+        imapuyo.puyo2y=12
+        imapuyo2.puyo1x=3
+        imapuyo2.puyo1y=13
+        imapuyo2.puyo2x=3
+        imapuyo2.puyo2y=12
+        t1=time.time()
+        sakiyomicpu_c=cpu.ai5(karifield.haichi,imapuyo,imapuyo2)
+        t2=time.time()
+        print(t2-t1)
+        kirikae_c=1
+      else:
+        if puyo_1.imapuyo_c==0:
+          cpu.cpu_c=sakiyomicpu_c
+          print(cpu.cpu_c)
+          kirikae_c=0
+          puyo_1.imapuyo_c=1
+        time.sleep(0.001)
+
 
 
 if __name__=='__main__':
@@ -396,9 +518,11 @@ if __name__=='__main__':
   player1=Player1()
   com_migi=COM_MIGI()
   com_hidari=COM_HIDARI()
+  com=COM()
   player2=Player2()
   karaplayer=Karaplayer()
   ai_cpu=AI_CPU()
+  ai_cpu2=AI_CPU2()
   
   #hyouji
   gamen=Gamen()
