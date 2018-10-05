@@ -1,5 +1,5 @@
 import time
-import copy
+import jisakucopy
 import random
 import numpy as np
 
@@ -207,6 +207,8 @@ class Field():
       self.haichi[j-1][i]=15
     return 1
  
+ 
+
   #renketukeshi
   def renketu3(self,i,j):
     a=self.haichi[j][i]
@@ -252,7 +254,7 @@ class Field():
         count23=0
         count24=0
         count31=0
-        y=copy.deepcopy(self.haichi)
+        y=jisakucopy.jisakucopy(self.haichi)
         self.renketu(i,j)
         for l in range(1,13):
           for k in range(1,7):
@@ -319,7 +321,7 @@ class Field():
     irosuu=[0,0,0,0]
     for j in range(1,13):
       for i in range(1,7):
-        y=copy.deepcopy(self.haichi)
+        y=jisakucopy.jisakucopy(self.haichi)
         self.count21=0
         self.count22=0
         self.count23=0
@@ -467,7 +469,7 @@ class Field():
 class AIField(Field):
 
   def __init__(self,haichi):
-    self.haichi=copy.deepcopy(haichi)
+    self.haichi=jisakucopy.jisakucopy(haichi)
     self.ojama=[0,0,0,0,0,0]
     self.counttotal=0
     self.counttotal2=0
@@ -578,19 +580,20 @@ class AIField(Field):
       self.haichi[13][5]=puyo.puyo1iro
     return
 
-  def renketusirabe(self,x):
+  #subetenopuyonorenketu
+  def renketusirabe(self):
     count3=0
     count4=0
-    y=copy.deepcopy(self.haichi)
+    y=jisakucopy.jisakucopy(self.haichi)
     for i in range(1,7):
       for j in range(1,13):
         if self.haichi[j][i]==0:
           break
         elif self.haichi[j][i]==1 or self.haichi[j][i]==2 or self.haichi[j][i]==3 or self.haichi[j][i]==4:
-          count21=0
-          count22=0
-          count23=0
-          count24=0
+          self.count21=0
+          self.count22=0
+          self.count23=0
+          self.count24=0
           self.renketu2(i,j)
           for k in range(1,7):
             for l in range(1,13):
@@ -598,156 +601,27 @@ class AIField(Field):
                 break
               if self.haichi[l][k]==11:
                 self.haichi[l][k]=20
-                count21+=1
                 count4+=l**2
               elif self.haichi[l][k]==12:
                 self.haichi[l][k]=20
-                count22+=1
                 count4+=l**2
               elif self.haichi[l][k]==13:
                 self.haichi[l][k]=20
-                count23+=1
                 count4+=l**2
               elif self.haichi[l][k]==14:
                 self.haichi[l][k]=20
-                count24+=1
                 count4+=l**2
-          count3=count3+count21**2+count22**2+count23**2+count24**2
-    self.haichi=copy.deepcopy(y)
+          count3=count3+self.count21**2+self.count22**2+self.count23**2+self.count24**2
+    self.haichi=jisakucopy.jisakucopy(y)
     return count3,count4
 
-  def renketusirabe2(self,x,puyo):
-    count3=0
-    count4=0
-    y=copy.deepcopy(self.haichi)
-    count21=0
-    count22=0
-    count23=0
-    count24=0
-    self.renketu(puyo.puyo1x,puyo.puyo1y)
-    for k in range(1,7):
-      for l in range(1,13):
-        if self.haichi[l][k]==0:
-          break
-        if self.haichi[l][k]==11:
-          self.haichi[l][k]=20
-          count21+=1
-          count4+=l**2
-        elif self.haichi[l][k]==12:
-          self.haichi[l][k]=20
-          count22+=1
-          count4+=l**2
-        elif self.haichi[l][k]==13:
-          self.haichi[l][k]=20
-          count23+=1
-          count4+=l**2
-        elif self.haichi[l][k]==14:
-          self.haichi[l][k]=20
-          count24+=1
-          count4+=l**2
-    count3=count3+count21**2+count22**2+count23**2+count24**2
-    if self.haichi[puyo.puyo2y][puyo.puyo2x]==1 or self.haichi[puyo.puyo2y][puyo.puyo2x]==2 or self.haichi[puyo.puyo2y][puyo.puyo2x]==3 or self.haichi[puyo.puyo2y][puyo.puyo2x]==4:
-      count21=0
-      count22=0
-      count23=0
-      count24=0
-      self.renketu(puyo.puyo2x,puyo.puyo2y)
-      for k in range(1,7):
-        for l in range(1,13):
-          if self.haichi[l][k]==0:
-            break
-          if self.haichi[l][k]==11:
-            self.haichi[l][k]=20
-            count21+=1
-            count4+=l**2
-          elif self.haichi[l][k]==12:
-            self.haichi[l][k]=20
-            count22+=1
-            count4+=l**2
-          elif self.haichi[l][k]==13:
-            self.haichi[l][k]=20
-            count23+=1
-            count4+=l**2
-          elif self.haichi[l][k]==14:
-            self.haichi[l][k]=20
-            count24+=1
-            count4+=l**2
-      count3=count3+count21**2+count22**2+count23**2+count24**2
-    self.haichi=copy.deepcopy(y)
-    return count3,count4
 
-  def renketusirabe3(self,x,puyo):
-    count3=0
-    count4=0
-    y=copy.deepcopy(self.haichi)
-    count21=0
-    count22=0
-    count23=0
-    count24=0
-    self.renketu(puyo.puyo1x,puyo.puyo1y)
-    for k in range(1,7):
-      for l in range(1,13):
-        if self.haichi[l][k]==0:
-          break
-        if self.haichi[l][k]==11:
-          self.haichi[l][k]=20
-          count21+=1
-          count4+=l**2
-        elif self.haichi[l][k]==12:
-          self.haichi[l][k]=20
-          count22+=1
-          count4+=l**2
-        elif self.haichi[l][k]==13:
-          self.haichi[l][k]=20
-          count23+=1
-          count4+=l**2
-        elif self.haichi[l][k]==14:
-          self.haichi[l][k]=20
-          count24+=1
-          count4+=l**2
-    if count21>=4:
-      count21=0
-    if count22>=4:
-      count22=0
-    if count23>=4:
-      count23=0
-    if count24>=4:
-      count24=0
-    count3=count3+count21**2+count22**2+count23**2+count24**2
-    if self.haichi[puyo.puyo2y][puyo.puyo2x]==1 or self.haichi[puyo.puyo2y][puyo.puyo2x]==2 or self.haichi[puyo.puyo2y][puyo.puyo2x]==3 or self.haichi[puyo.puyo2y][puyo.puyo2x]==4:
-      count21=0
-      count22=0
-      count23=0
-      count24=0
-      self.renketu(puyo.puyo2x,puyo.puyo2y)
-      for k in range(1,7):
-        for l in range(1,13):
-          if self.haichi[l][k]==0:
-            break
-          if self.haichi[l][k]==11:
-            self.haichi[l][k]=20
-            count21+=1
-            count4+=l**2
-          elif self.haichi[l][k]==12:
-            self.haichi[l][k]=20
-            count22+=1
-            count4+=l**2
-          elif self.haichi[l][k]==13:
-            self.haichi[l][k]=20
-            count23+=1
-            count4+=l**2
-          elif self.haichi[l][k]==14:
-            self.haichi[l][k]=20
-            count24+=1
-            count4+=l**2
-      count3=count3+count21**2+count22**2+count23**2+count24**2
-    self.haichi=copy.deepcopy(y)
-    return count3,count4
-
+  
+  #oitapuyokaranorenketusuu,takasa
   def renketusirabe4(self,puyo):
     count3=0
     count4=0
-    y=copy.deepcopy(self.haichi)
+    y=jisakucopy.jisakucopy(self.haichi)
     self.count21=0
     self.count22=0
     self.count23=0
@@ -761,20 +635,21 @@ class AIField(Field):
       self.count24=0
       self.renketu2(puyo.puyo2x,puyo.puyo2y)
       count3=count3+self.count21**2+self.count22**2+self.count23**2+self.count24**2
-    self.haichi=copy.deepcopy(y)
+    self.haichi=jisakucopy.jisakucopy(y)
     return count3,puyo.puyo1y**2+puyo.puyo2y**2
-
+  
+  #4renketuhadame
   def renketusirabe5(self,puyo):
     count3=0
     count4=0
-    y=copy.deepcopy(self.haichi)
+    y=jisakucopy.jisakucopy(self.haichi)
     self.count21=0
     self.count22=0
     self.count23=0
     self.count24=0
     self.renketu2(puyo.puyo1x,puyo.puyo1y)
     if self.count21>=4 or self.count22>=4 or self.count23>=4 or self.count24>=4:
-      self.haichi=copy.deepcopy(y)
+      self.haichi=jisakucopy.jisakucopy(y)
       return True
     if self.haichi[puyo.puyo2y][puyo.puyo2x]==1 or self.haichi[puyo.puyo2y][puyo.puyo2x]==2 or self.haichi[puyo.puyo2y][puyo.puyo2x]==3 or self.haichi[puyo.puyo2y][puyo.puyo2x]==4:
       self.count21=0
@@ -783,9 +658,9 @@ class AIField(Field):
       self.count24=0
       self.renketu2(puyo.puyo2x,puyo.puyo2y)
       if self.count21>=4 or self.count22>=4 or self.count23>=4 or self.count24>=4:
-        self.haichi=copy.deepcopy(y)
+        self.haichi=jisakucopy.jisakucopy(y)
         return True
-    self.haichi=copy.deepcopy(y)
+    self.haichi=jisakucopy.jisakucopy(y)
     return False
 
   #renketukeshi
@@ -805,6 +680,8 @@ class AIField(Field):
           self.renketu3(i,j)
     for l in range(1,13):
       for k in range(1,7):
+        if self.haichi[l][k]==0:
+          continue
         if self.haichi[l][k]==11:
           self.haichi[l][k]=1
         elif self.haichi[l][k]==12: 
@@ -818,8 +695,41 @@ class AIField(Field):
 
     return count3
 
+  #renketukeshi_sannsyou
+  def renketukeshi2_2(self):
+    count3=0
+    for y,j in enumerate(self.haichi):
+      for x,i in enumerate(j):
+        if i==0 or i==11 or i==12 or i==13 or i==14 or i==15 or 1==20:
+          continue
+        self.count21=0
+        self.count22=0
+        self.count23=0
+        self.count24=0
+        self.renketu2(x,y)
+        if self.count21>=4 or self.count22>=4 or self.count23>=4 or self.count24>=4:
+          count3+=self.count21+self.count22+self.count23+self.count24
+          self.renketu3(x,y)
+    for l in self.haichi:
+      for k in l:
+        if k==0:
+          continue
+        if k==11:
+          k=1
+        elif k==12: 
+          k=2
+        elif k==13:
+          k=3
+        elif k==14:
+          k=4
+        elif k==15:
+          k=5
+
+    return count3
+
+
   def renketukeshi3(self,i,j):
-    y=copy.deepcopy(self.haichi)
+    y=jisakucopy.jisakucopy(self.haichi)
     self.count21=0
     self.count22=0
     self.count23=0
@@ -858,33 +768,33 @@ class AIField(Field):
       for j in range(1,13):
         if self.haichi[j][i]==0:
           break
-        q=copy.deepcopy(self.haichi)
+        q=jisakucopy.jisakucopy(self.haichi)
         self.rensa_c=0
         if self.hakkatensirabe(i,j):
           continue
         self.renketukeshi3(i,j) 
-        if self.count21<2 and self.count22<2 and self.count23<2 and self.count24<2:
-          self.haichi=copy.deepcopy(q)
+        if self.count21<3 and self.count22<3 and self.count23<3 and self.count24<3:
+          self.haichi=jisakucopy.jisakucopy(q)
           continue
         self.rakka(14)
         self.sokurensa()
         kekka_rensasuu[i-1][j-1]=self.rensa_c
-        self.haichi=copy.deepcopy(q)
+        self.haichi=jisakucopy.jisakucopy(q)
     return kekka_rensasuu.max()
 
   def shin_rensashirabe(self):
-    q=copy.deepcopy(self.haichi)
+    q=jisakucopy.jisakucopy(self.haichi)
     self.rensa_c=0
     self.sokurensa()
-    self.haichi=copy.deepcopy(q)
+    self.haichi=jisakucopy.jisakucopy(q)
     return self.rensa_c
 
   def hakkatensirabe(self,i,j):
-    if self.haichi[j][i-1]==0:
+    if self.haichi[j][i-1]==0 and self.haichi[j-2][i-1]!=0:
       return False
     elif self.haichi[j+1][i]==0:
       return False
-    elif self.haichi[j][i+1]==0:
+    elif self.haichi[j][i+1]==0 and self.haichi[j-2][i+1]!=0:
       return False
     else:
       return True

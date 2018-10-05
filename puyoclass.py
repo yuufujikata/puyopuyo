@@ -106,6 +106,7 @@ class Puyo():
     self.suri=-11
     self.suri2=-11
     self.rakkab_c=0
+    self.imapuyo_c=0
     return 
 
 
