@@ -4,6 +4,7 @@ import threading
 import time
 import sys
 import random
+from cProfile import Profile
 
 #----self module----
 from puyoclass import Puyo
@@ -61,7 +62,7 @@ def main():
     karaplayer.start()
   if start_c==6:
     com_hidari.start()
-    ai_cpu.start()
+    ai_cpu2.start()
     karaplayer.start()
   if start_c==7:
     com.start()
@@ -488,7 +489,11 @@ class AI_CPU2(threading.Thread):
         imapuyo2.puyo2x=3
         imapuyo2.puyo2y=12
         t1=time.time()
+#        pr=Profile()
+#        pr.enable()
         sakiyomicpu_c=cpu.ai5(karifield.haichi,imapuyo,imapuyo2)
+#        pr.disable()
+#        pr.print_stats()
         t2=time.time()
         print(t2-t1)
         kirikae_c=1

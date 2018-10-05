@@ -3,7 +3,7 @@ import numpy as np
 from fieldclass import AIField
 from puyoclass import AIPuyo
 import time
-import copy
+import jisakucopy
 
 class CPU():  
  
@@ -85,7 +85,64 @@ class CPU():
 
   #rensa
   def ai5(self,haichi,puyo_1,puyo_2):
+    kekka=np.zeros((4,22,22),dtype=np.int)
+    aipuyo_1=AIPuyo()
+    aipuyo_2=AIPuyo()
+    for i in range(22):
+      aifield=AIField(haichi)
+      aipuyo_1.syokika(puyo_1)
+      idouhantei_c=self.cpu_idouhantei(aifield,aipuyo_1,i+1)
+      if idouhantei_c!=1:
+        continue
+      aipuyo_1.puyooki(i+1)
+      aipuyo_1.rakka(aifield.haichi)
+      if aifield.shin_rensashirabe()>=9:
+        return i+1
+      if aifield.renketusirabe5(aipuyo_1):
+         aifield.sokurensa()
+#        kekka[1][i][0]=1
+#        continue
+#      kekka[3][i][0]=aifield.rensashirabe()
+      for j in range(22):
+        aipuyo_2.syokika(puyo_2)
+        y=jisakucopy.jisakucopy(aifield.haichi)
+        idouhantei_c_2=self.cpu_idouhantei(aifield,aipuyo_2,j+1)
+        if idouhantei_c_2!=1:
+          continue
+        aipuyo_2.puyooki(j+1)
+        aipuyo_2.rakka(aifield.haichi)
+        if aifield.renketusirabe5(aipuyo_2):
+          aifield.sokurensa() 
+#          aifield.haichi=copy.deepcopy(y)
+#          kekka[1][i][j]=1
+#          continue
+        b=aifield.renketusirabe()
+        kekka[0][i][j]=b[0]
+        kekka[1][i][j]=1000000-b[1]
+        kekka[2][i][j]=aifield.rensashirabe()
+        aifield.haichi=jisakucopy.jisakucopy(y)
+#    rensamax_1=kekka[3].max()
+    rensamax=kekka[2].max()
+#    if rensamax_1>=rensamax_2:
+#      rensamax=rensamax_1
+#    else:
+#      rensamax=rensamax_2
+    for i in range(22):
+      for j in range(22):
+        if kekka[2][i][j]!=rensamax:# kekka[3][i][0]!=rensamax:
+          kekka[0][i][j]=0
+    renketumax=kekka[0].max()
+    for i in range(22):
+      for j in range(22):
+        if kekka[0][i][j]!=renketumax:
+          kekka[1][i][j]=0
+    c=kekka[1].max(axis=1)
+    return c.argmax()+1
+
+  #rensa hyoukakannsuugata
+  def ai6(self,haichi,puyo_1,puyo_2):
     kekka=np.zeros((3,22,22),dtype=np.int)
+    kekka_hyouka=np.zeros(22,dtype=np.int)
     aipuyo_1=AIPuyo()
     aipuyo_2=AIPuyo()
     for i in range(22):
@@ -94,6 +151,7 @@ class CPU():
       idouhantei_c=self.cpu_idouhantei(aifield,aipuyo_1,i+1)
       print(i+1,idouhantei_c)
       if idouhantei_c!=1:
+        kekka_hyouka[i]-=1000000
         continue
       aipuyo_1.puyooki(i+1)
       aipuyo_1.rakka(aifield.haichi)
@@ -103,33 +161,26 @@ class CPU():
         continue
       for j in range(22):
         aipuyo_2.syokika(puyo_2)
-        y=copy.deepcopy(aifield.haichi)
+        y=jisakucopy.jisakucopy(aifield.haichi)
         idouhantei_c_2=self.cpu_idouhantei(aifield,aipuyo_2,j+1)
         if idouhantei_c_2!=1:
           continue
         aipuyo_2.puyooki(j+1)
         aipuyo_2.rakka(aifield.haichi)
         if aifield.renketusirabe5(aipuyo_2):
-          aifield.haichi=copy.deepcopy(y)
+          aifield.haichi=jisakucopy.jisakucopy(y)
           continue
         b=aifield.renketusirabe()
         kekka[0][i][j]=b[0]
         kekka[1][i][j]=b[1]
         kekka[2][i][j]=aifield.rensashirabe()
-        aifield.haichi=copy.deepcopy(y)
+        aifield.haichi=jisakucopy.jisakucopy(y)
     print(kekka)
-    rensamax=kekka[2].max()
     for i in range(22):
-      for j in range(22):
-        if kekka[2][i][j]!=rensamax:
-          kekka[0][i][j]=0
-    renketumax=kekka[0].max()
-    for i in range(22):
-      for j in range(22):
-        if kekka[0][i][j]!=renketumax:
-          kekka[1][i][j]=100000
-    c=kekka[1].min(axis=1)
-    return c.argmin()+1
+      kekka_hyouka[i]+=kekka[2][i].max()*1000000
+      kekka_hyouka[i]+=kekka[0][i].max()*1000
+      kekka_hyouka[i]-=kekka[1][i].min()
+    return kekka_hyouka.argmax()+1
 
 
   def cpu_os(self):
@@ -187,7 +238,16 @@ class CPU():
 
     elif x==3:
       if field.haichi[10][3]!=0:
-        return 0
+        y=jisakucopy.jisakucopy(field.haichi)
+        puyo.puyooki(3)
+        puyo.rakka(field.haichi)
+        field.sokurensa()
+        if field.haichi[12][3]!=0:
+          field.haichi=jisakucopy.jisakucopy(y)
+          return 0
+        else:
+          field.haichi=jisakucopy.jisakucopy(y)
+          return 1
       else:
         return 1
 
@@ -320,7 +380,16 @@ class CPU():
 
     elif x==9:
       if field.haichi[10][3]!=0:
-        return 0
+        y=jisakucopy.jisakucopy(field.haichi)
+        puyo.puyooki(3)
+        puyo.rakka(field.haichi)
+        field.sokurensa()
+        if field.haichi[12][3]!=0:
+          field.haichi=jisakucopy.jisakucopy(y)
+          return 0
+        else:
+          field.haichi=jisakucopy.jisakucopy(y)
+          return 1
       else:
         return 1
 
@@ -434,8 +503,19 @@ class CPU():
 
 
     elif x==14:
-      if field.haichi[13][2]!=0 or field.haichi[11][3]!=0:
+      if field.haichi[13][2]!=0: 
         return 0
+      elif field.haichi[11][3]!=0:
+        y=jisakucopy.jisakucopy(field.haichi)
+        puyo.puyooki(3)
+        puyo.rakka(field.haichi)
+        field.sokurensa()
+        if field.haichi[12][3]!=0:
+          field.haichi=jisakucopy.jisakucopy(y)
+          return 0
+        else:
+          field.haichi=jisakucopy.jisakucopy(y)
+          return 1
       elif field.haichi[puyo.puyo2y+1][2]!=0:
         return 0
       elif field.haichi[puyo.puyo2y][2]!=0: 
@@ -452,8 +532,19 @@ class CPU():
 
 
     elif x==15:
-      if field.haichi[11][3]!=0 or field.haichi[13][4]!=0:
+      if field.haichi[13][4]!=0:
         return 0
+      elif field.haichi[11][3]!=0: 
+        y=jisakucopy.jisakucopy(field.haichi)
+        puyo.puyooki(3)
+        puyo.rakka(field.haichi)
+        field.sokurensa()
+        if field.haichi[12][3]!=0:
+          field.haichi=jisakucopy.jisakucopy(y)
+          return 0
+        else:
+          field.haichi=jisakucopy.jisakucopy(y)
+          return 1
       elif field.haichi[puyo.puyo2y][4]!=0:
         if field.haichi[puyo.puyo2y-1][puyo.puyo2x]!=0:
           return 1
@@ -479,7 +570,6 @@ class CPU():
           return 1
         elif field.haichi[puyo.puyo2y-1][1]!=0 and field.haichi[puyo.puyo2y][1]==0:
           return 1
-        
         else:
           return 0
       elif field.haichi[puyo.puyo2y][5]!=0:
@@ -569,8 +659,19 @@ class CPU():
 
 
     elif x==19:
-      if field.haichi[11][3]!=0 or field.haichi[13][2]!=0:
+      if field.haichi[13][2]!=0:
         return 0
+      if field.haichi[11][3]!=0: 
+        y=jisakucopy.jisakucopy(field.haichi)
+        puyo.puyooki(3)
+        puyo.rakka(field.haichi)
+        field.sokurensa()
+        if field.haichi[12][3]!=0:
+          field.haichi=jisakucopy.jisakucopy(y)
+          return 0
+        else:
+          field.haichi=jisakucopy.jisakucopy(y)
+          return 1
       elif field.haichi[puyo.puyo2y][2]!=0:
         if field.haichi[puyo.puyo2y-1][puyo.puyo2x]!=0:
           return 1
@@ -591,8 +692,19 @@ class CPU():
 
 
     elif x==20:
-      if field.haichi[13][4]!=0 or field.haichi[11][3]!=0:
+      if field.haichi[13][4]!=0: 
         return 0
+      elif field.haichi[11][3]!=0:
+        y=jisakucopy.jisakucopy(field.haichi)
+        puyo.puyooki(3)
+        puyo.rakka(field.haichi)
+        field.sokurensa()
+        if field.haichi[12][3]!=0:
+          field.haichi=jisakucopy.jisakucopy(y)
+          return 0
+        else:
+          field.haichi=jisakucopy.jisakucopy(y)
+          return 1
       elif field.haichi[puyo.puyo2y+1][4]!=0:
         return 0
       elif field.haichi[puyo.puyo2y][4]!=0:
@@ -698,12 +810,13 @@ class CPU():
           puyo.kaiten_c=2
         else:
           puyo.kaiten_c=1
-      elif field.haichi[puyo.puyo2y-1][2]!=0 and field.haichi[puyo.puyo2y][2]==0:
-        puyo.hidari_c+=1
-      elif field.haichi[puyo.puyo2y-1][4]!=0 and field.haichi[puyo.puyo2y][4]==0:
-        puyo.migi_c+=1
-      elif field.haichi[puyo.puyo2y-1][5]!=0 and field.haichi[puyo.puyo2y][5]==0:
-        puyo.migi_c+=1
+      elif  field.haichi[puyo.puyo2y][2]==0 and field.haichi[puyo.puyo2y-1][2]!=0 :
+          puyo.hidari_c+=1
+      elif field.haichi[puyo.puyo2y][4]==0:
+        if field.haichi[puyo.puyo2y-1][4]!=0: 
+          puyo.migi_c+=1
+        elif field.haichi[puyo.puyo2y-1][5]!=0 and field.haichi[puyo.puyo2y][5]==0:
+          puyo.migi_c+=1
       elif field.haichi[puyo.puyo2y][2]!=0 and field.haichi[puyo.puyo2y][4]!=0:
         puyo.kaiten_c=1
       else: 
@@ -738,10 +851,11 @@ class CPU():
           puyo.kaiten_c=2
         else:
           puyo.kaiten_c=1
-      elif field.haichi[puyo.puyo2y-1][4]!=0 and field.haichi[puyo.puyo2y][4]==0:
-        puyo.migi_c+=1
-      elif field.haichi[puyo.puyo2y-1][5]!=0 and field.haichi[puyo.puyo2y][5]==0:
-        puyo.migi_c+=1
+      elif field.haichi[puyo.puyo2y][4]==0:
+        if field.haichi[puyo.puyo2y-1][4]!=0: 
+          puyo.migi_c+=1
+        elif field.haichi[puyo.puyo2y-1][5]!=0 and field.haichi[puyo.puyo2y][5]==0:
+          puyo.migi_c+=1
       elif field.haichi[puyo.puyo2y][2]!=0 and field.haichi[puyo.puyo2y][4]!=0:
         puyo.kaiten_c=1
       else:
@@ -794,10 +908,11 @@ class CPU():
           puyo.kaiten_c=1
         else:
           puyo.kaiten_c=2
-      elif field.haichi[puyo.puyo2y-1][2]!=0 and field.haichi[puyo.puyo2y][2]==0:
-        puyo.hidari_c+=1
-      elif field.haichi[puyo.puyo2y-1][1]!=0 and field.haichi[puyo.puyo2y][1]==0:
-        puyo.hidari_c+=1
+      elif field.haichi[puyo.puyo2y][2]==0:
+        if field.haichi[puyo.puyo2y-1][2]!=0: 
+          puyo.hidari_c+=1
+        elif field.haichi[puyo.puyo2y-1][1]!=0 and field.haichi[puyo.puyo2y][1]==0:
+          puyo.hidari_c+=1
       elif field.haichi[puyo.puyo2y][2]!=0 and field.haichi[puyo.puyo2y][4]!=0:
         puyo.kaiten_c=2
       else:
@@ -834,10 +949,11 @@ class CPU():
           puyo.kaiten_c=2
       elif field.haichi[puyo.puyo2y-1][4]!=0 and field.haichi[puyo.puyo2y][4]==0:
         puyo.migi_c+=1
-      elif field.haichi[puyo.puyo2y-1][2]!=0 and field.haichi[puyo.puyo2y][2]==0:
-        puyo.hidari_c+=1
-      elif field.haichi[puyo.puyo2y-1][1]!=0 and field.haichi[puyo.puyo2y][1]==0:
-        puyo.hidari_c+=1
+      elif field.haichi[puyo.puyo2y][2]==0:
+        if field.haichi[puyo.puyo2y-1][2]!=0: 
+          puyo.hidari_c+=1
+        elif field.haichi[puyo.puyo2y-1][1]!=0 and field.haichi[puyo.puyo2y][1]==0:
+          puyo.hidari_c+=1
       elif field.haichi[puyo.puyo2y][2]!=0 and field.haichi[puyo.puyo2y][4]!=0:
         puyo.kaiten_c=2
       else:
@@ -869,14 +985,16 @@ class CPU():
           puyo.kaiten_c=1
         else:
           puyo.kaiten_c=2
-      elif field.haichi[puyo.puyo2y-1][4]!=0 and field.haichi[puyo.puyo2y][4]==0:
-        puyo.migi_c+=1
-      elif field.haichi[puyo.puyo2y-1][5]!=0 and field.haichi[puyo.puyo2y][5]==0:
-        puyo.migi_c+=1
-      elif field.haichi[puyo.puyo2y-1][2]!=0 and field.haichi[puyo.puyo2y][2]==0:
-        puyo.hidari_c+=1
-      elif field.haichi[puyo.puyo2y-1][1]!=0 and field.haichi[puyo.puyo2y][1]==0:
-        puyo.hidari_c+=1
+      elif field.haichi[puyo.puyo2y][4]==0:
+        if field.haichi[puyo.puyo2y-1][4]!=0: 
+          puyo.migi_c+=1
+        elif field.haichi[puyo.puyo2y-1][5]!=0 and field.haichi[puyo.puyo2y][5]==0:
+          puyo.migi_c+=1
+      elif field.haichi[puyo.puyo2y][2]==0:
+        if field.haichi[puyo.puyo2y-1][2]!=0: 
+          puyo.hidari_c+=1
+        elif field.haichi[puyo.puyo2y-1][1]!=0 and field.haichi[puyo.puyo2y][1]==0:
+          puyo.hidari_c+=1
       elif field.haichi[puyo.puyo2y][2]!=0 and field.haichi[puyo.puyo2y][4]!=0:
         puyo.kaiten_c=2
       else:
@@ -908,10 +1026,11 @@ class CPU():
           puyo.kaiten_c=1
       elif field.haichi[puyo.puyo2y-1][2]!=0 and field.haichi[puyo.puyo2y][2]==0:
         puyo.hidari_c+=1
-      elif field.haichi[puyo.puyo2y-1][4]!=0 and field.haichi[puyo.puyo2y][4]==0:
-        puyo.migi_c+=1
-      elif field.haichi[puyo.puyo2y-1][5]!=0 and field.haichi[puyo.puyo2y][5]==0:
-        puyo.migi_c+=1
+      elif field.haichi[puyo.puyo2y][4]==0:
+        if field.haichi[puyo.puyo2y-1][4]!=0: 
+          puyo.migi_c+=1
+        elif field.haichi[puyo.puyo2y-1][5]!=0 and field.haichi[puyo.puyo2y][5]==0:
+          puyo.migi_c+=1
       elif field.haichi[puyo.puyo2y][2]!=0 and field.haichi[puyo.puyo2y][4]!=0:
         puyo.kaiten_c=1
       else: 
@@ -1008,10 +1127,11 @@ class CPU():
           puyo.kaiten_c=2
       elif field.haichi[puyo.puyo2y-1][4]!=0 and field.haichi[puyo.puyo2y][4]==0:
         puyo.migi_c+=1
-      elif field.haichi[puyo.puyo2y-1][2]!=0 and field.haichi[puyo.puyo2y][2]==0:
-        puyo.hidari_c+=1
-      elif field.haichi[puyo.puyo2y-1][1]!=0 and field.haichi[puyo.puyo2y][1]==0:
-        puyo.hidari_c+=1
+      elif field.haichi[puyo.puyo2y][2]==0:
+        if field.haichi[puyo.puyo2y-1][2]!=0: 
+          puyo.hidari_c+=1
+        elif field.haichi[puyo.puyo2y-1][1]!=0 and field.haichi[puyo.puyo2y][1]==0:
+          puyo.hidari_c+=1
       elif field.haichi[puyo.puyo2y][2]!=0 and field.haichi[puyo.puyo2y][4]!=0:
         puyo.kaiten_c=2
       else: 
@@ -1043,14 +1163,16 @@ class CPU():
           puyo.kaiten_c=1
         else:
           puyo.kaiten_c=2
-      elif field.haichi[puyo.puyo2y-1][4]!=0 and field.haichi[puyo.puyo2y][4]==0:
-        puyo.migi_c+=1
-      elif field.haichi[puyo.puyo2y-1][5]!=0 and field.haichi[puyo.puyo2y][5]==0:
-        puyo.migi_c+=1
-      elif field.haichi[puyo.puyo2y-1][2]!=0 and field.haichi[puyo.puyo2y][2]==0:
-        puyo.hidari_c+=1
-      elif field.haichi[puyo.puyo2y-1][1]!=0 and field.haichi[puyo.puyo2y][1]==0:
-        puyo.hidari_c+=1
+      elif field.haichi[puyo.puyo2y][4]==0:
+        if field.haichi[puyo.puyo2y-1][4]!=0: 
+          puyo.migi_c+=1
+        elif field.haichi[puyo.puyo2y-1][5]!=0 and field.haichi[puyo.puyo2y][5]==0:
+          puyo.migi_c+=1
+      elif field.haichi[puyo.puyo2y][2]==0:
+        if field.haichi[puyo.puyo2y-1][2]!=0: 
+          puyo.hidari_c+=1
+        elif field.haichi[puyo.puyo2y-1][1]!=0 and field.haichi[puyo.puyo2y][1]==0:
+          puyo.hidari_c+=1
       elif field.haichi[puyo.puyo2y][2]!=0 and field.haichi[puyo.puyo2y][4]!=0:
         puyo.kaiten_c=2
       else: 
@@ -1084,10 +1206,11 @@ class CPU():
           puyo.kaiten_c=1
       elif field.haichi[puyo.puyo2y-1][2]!=0 and field.haichi[puyo.puyo2y][2]==0:
         puyo.hidari_c+=1
-      elif field.haichi[puyo.puyo2y-1][4]!=0 and field.haichi[puyo.puyo2y][4]==0:
-        puyo.migi_c+=1
-      elif field.haichi[puyo.puyo2y-1][5]!=0 and field.haichi[puyo.puyo2y][5]==0:
-        puyo.migi_c+=1
+      elif field.haichi[puyo.puyo2y][4]==0:
+        if field.haichi[puyo.puyo2y-1][4]!=0: 
+          puyo.migi_c+=1
+        elif field.haichi[puyo.puyo2y-1][5]!=0 and field.haichi[puyo.puyo2y][5]==0:
+          puyo.migi_c+=1
       elif field.haichi[puyo.puyo2y][2]!=0 and field.haichi[puyo.puyo2y][4]!=0:
         puyo.kaiten_c=1
       else: 
@@ -1122,10 +1245,11 @@ class CPU():
           puyo.kaiten_c=2
         else:
           puyo.kaiten_c=1
-      elif field.haichi[puyo.puyo2y-1][4]!=0 and field.haichi[puyo.puyo2y][4]==0:
-        puyo.migi_c+=1
-      elif field.haichi[puyo.puyo2y-1][5]!=0 and field.haichi[puyo.puyo2y][5]==0:
-        puyo.migi_c+=1
+      elif field.haichi[puyo.puyo2y][4]==0:
+        if field.haichi[puyo.puyo2y-1][4]!=0: 
+          puyo.migi_c+=1
+        elif field.haichi[puyo.puyo2y-1][5]!=0 and field.haichi[puyo.puyo2y][5]==0:
+          puyo.migi_c+=1
       elif field.haichi[puyo.puyo2y][2]!=0 and field.haichi[puyo.puyo2y][4]!=0:
         puyo.kaiten_c=1
       else:
@@ -1135,7 +1259,7 @@ class CPU():
     elif self.cpu_c==15:
       if field.haichi[11][3]!=0 or field.haichi[13][4]!=0:
         return 0
-      if puyo.puyo2x==3:
+      if puyo.puyo2x==3 and field.haichi[puyo.puyo2y][4]==0:
         if puyo.puyo2x==puyo.puyo1x-1:
           puyo.shita_c+=self.cpu_os()
           return 1
@@ -1143,11 +1267,23 @@ class CPU():
           puyo.kaiten_c=1
         else:
           puyo.kaiten_c=2
-      elif field.haichi[puyo.puyo2y][3]==0:
+      elif field.haichi[puyo.puyo2y][3]==0 and field.haichi[puyo.puyo2y][4]==0:
         if puyo.puyo2x<3:
           puyo.migi_c+=1
         elif puyo.puyo2x>3:
           puyo.hidari_c+=1
+      elif field.haichi[puyo.puyo2y-1][puyo.puyo2x]!=0: 
+        if field.haichi[puyo.puyo2y][puyo.puyo2x+1]==0:
+          puyo.kaiten_c=2
+        else:
+          puyo.kaiten_c=1
+      elif field.haichi[puyo.puyo2y][2]==0:
+        if field.haichi[puyo.puyo2y-1][2]!=0: 
+          puyo.hidari_c+=1
+        elif field.haichi[puyo.puyo2y-1][1]!=0 and field.haichi[puyo.puyo2y][1]==0:
+          puyo.hidari_c+=1
+      elif field.haichi[puyo.puyo2y][2]!=0 and field.haichi[puyo.puyo2y][4]!=0:
+        puyo.kaiten_c=2
       else:
         return 0
 
@@ -1155,7 +1291,7 @@ class CPU():
     elif self.cpu_c==16:
       if field.haichi[13][4]!=0 or field.haichi[13][5]!=0:
         return 0
-      if puyo.puyo2x==4:
+      if puyo.puyo2x==4 and field.haichi[puyo.puyo2y][5]==0:
         if puyo.puyo2x==puyo.puyo1x-1:
           puyo.shita_c+=self.cpu_os()
           return 1
@@ -1163,7 +1299,7 @@ class CPU():
           puyo.kaiten_c=1
         else:
           puyo.kaiten_c=2
-      elif field.haichi[puyo.puyo2y][4]==0:
+      elif field.haichi[puyo.puyo2y][4]==0 and field.haichi[puyo.puyo2y][5]==0:
         if puyo.puyo2y==puyo.puyo1y+1:
           if field.haichi[puyo.puyo2y-1][puyo.puyo2x+1]==0:
             puyo.kaiten_c=2
@@ -1180,10 +1316,13 @@ class CPU():
           puyo.kaiten_c=2
         else:
           puyo.kaiten_c=1
-      elif field.haichi[puyo.puyo2y-1][2]!=0 and field.haichi[puyo.puyo2y][2]==0:
-        puyo.hidari_c+=1
-      elif field.haichi[puyo.puyo2y-1][1]!=0 and field.haichi[puyo.puyo2y][1]==0:
-        puyo.hidari_c+=1
+      elif field.haichi[puyo.puyo2y-1][4]!=0 and field.haichi[puyo.puyo2y][4]==0:
+        puyo.migi_c+=1
+      elif field.haichi[puyo.puyo2y][2]==0:
+        if field.haichi[puyo.puyo2y-1][2]!=0: 
+          puyo.hidari_c+=1
+        elif field.haichi[puyo.puyo2y-1][1]!=0 and field.haichi[puyo.puyo2y][1]==0:
+          puyo.hidari_c+=1
       elif field.haichi[puyo.puyo2y][2]!=0 and field.haichi[puyo.puyo2y][4]!=0:
         puyo.kaiten_c=2
       else:
@@ -1193,7 +1332,7 @@ class CPU():
     elif self.cpu_c==17:
       if field.haichi[13][5]!=0 or field.haichi[13][4]!=0 or field.haichi[13][6]!=0:
         return 0
-      if puyo.puyo2x==5:
+      if puyo.puyo2x==5 and field.haichi[puyo.puyo2y][6]==0:
         if puyo.puyo2x==puyo.puyo1x-1:
           puyo.shita_c+=self.cpu_os()
           return 1
@@ -1201,7 +1340,7 @@ class CPU():
           puyo.kaiten_c=1
         else:
           puyo.kaiten_c=2
-      elif field.haichi[puyo.puyo2y][4]==0 and field.haichi[puyo.puyo2y][5]==0:
+      elif field.haichi[puyo.puyo2y][4]==0 and field.haichi[puyo.puyo2y][5]==0 and field.haichi[puyo.puyo2y][6]==0:
         if puyo.puyo2y==puyo.puyo1y+1:
           if field.haichi[puyo.puyo2y-1][puyo.puyo2x+1]==0:
             puyo.kaiten_c=2
@@ -1218,12 +1357,16 @@ class CPU():
           puyo.kaiten_c=2
         else:
           puyo.kaiten_c=1
-      elif field.haichi[puyo.puyo2y-1][4]!=0 and field.haichi[puyo.puyo2y][4]==0:
-        puyo.migi_c+=1
-      elif field.haichi[puyo.puyo2y-1][2]!=0 and field.haichi[puyo.puyo2y][2]==0:
-        puyo.hidari_c+=1
-      elif field.haichi[puyo.puyo2y-1][1]!=0 and field.haichi[puyo.puyo2y][1]==0:
-        puyo.hidari_c+=1
+      elif field.haichi[puyo.puyo2y][4]==0:
+        if field.haichi[puyo.puyo2y-1][4]!=0: 
+          puyo.migi_c+=1
+        elif field.haichi[puyo.puyo2y-1][5]!=0 and field.haichi[puyo.puyo2y][5]==0:
+          puyo.migi_c+=1
+      elif field.haichi[puyo.puyo2y][2]==0:
+        if field.haichi[puyo.puyo2y-1][2]!=0: 
+          puyo.hidari_c+=1
+        elif field.haichi[puyo.puyo2y-1][1]!=0 and field.haichi[puyo.puyo2y][1]==0:
+          puyo.hidari_c+=1
       elif field.haichi[puyo.puyo2y][2]!=0 and field.haichi[puyo.puyo2y][4]!=0:
         puyo.kaiten_c=2
       else:
@@ -1233,7 +1376,7 @@ class CPU():
     elif self.cpu_c==18:
       if field.haichi[13][2]!=0 or field.haichi[13][1]!=0:
         return 0
-      if puyo.puyo2x==2:
+      if puyo.puyo2x==2 and field.haichi[puyo.puyo2y][1]==0:
         if puyo.puyo2x==puyo.puyo1x+1:
           puyo.shita_c+=self.cpu_os()
           return 1
@@ -1241,7 +1384,7 @@ class CPU():
           puyo.kaiten_c=2
         else:
           puyo.kaiten_c=1
-      elif field.haichi[puyo.puyo2y][2]==0:
+      elif field.haichi[puyo.puyo2y][2]==0 and field.haichi[puyo.puyo2y][1]==0:
         if puyo.puyo2y==puyo.puyo1y+1:
           if field.haichi[puyo.puyo2y-1][puyo.puyo2x-1]==0:
             puyo.kaiten_c=1
@@ -1258,10 +1401,13 @@ class CPU():
           puyo.kaiten_c=1
         else:
           puyo.kaiten_c=2
-      elif field.haichi[puyo.puyo2y-1][4]!=0 and field.haichi[puyo.puyo2y][4]==0:
-        puyo.migi_c+=1
-      elif field.haichi[puyo.puyo2y-1][5]!=0 and field.haichi[puyo.puyo2y][5]==0:
-        puyo.migi_c+=1
+      elif field.haichi[puyo.puyo2y-1][2]!=0 and field.haichi[puyo.puyo2y][2]==0:
+        puyo.hidari_c+=1
+      elif field.haichi[puyo.puyo2y][4]==0:
+        if field.haichi[puyo.puyo2y-1][4]!=0: 
+          puyo.migi_c+=1
+        elif field.haichi[puyo.puyo2y-1][5]!=0 and field.haichi[puyo.puyo2y][5]==0:
+          puyo.migi_c+=1
       elif field.haichi[puyo.puyo2y][2]!=0 and field.haichi[puyo.puyo2y][4]!=0:
         puyo.kaiten_c=2
       else:
@@ -1271,7 +1417,7 @@ class CPU():
     elif self.cpu_c==19:
       if field.haichi[11][3]!=0 or field.haichi[13][2]!=0:
         return 0
-      if puyo.puyo2x==3:
+      if puyo.puyo2x==3 and field.haichi[puyo.puyo2y][2]==0:
         if puyo.puyo2x==puyo.puyo1x+1:
           puyo.shita_c+=self.cpu_os()
           return 1
@@ -1279,11 +1425,26 @@ class CPU():
           puyo.kaiten_c=2
         else:
           puyo.kaiten_c=1
-      elif field.haichi[puyo.puyo2y][3]==0:
+      elif field.haichi[puyo.puyo2y][3]==0 and field.haichi[puyo.puyo2y][2]==0:
         if puyo.puyo2x<3:
           puyo.migi_c+=1
         elif puyo.puyo2x>3:
           puyo.hidari_c+=1
+      elif field.haichi[puyo.puyo2y-1][puyo.puyo2x]!=0: 
+        if field.haichi[puyo.puyo2y][puyo.puyo2x-1]==0:
+          puyo.kaiten_c=1
+        else:
+          puyo.kaiten_c=2
+      elif field.haichi[puyo.puyo2y][4]==0:
+        if field.haichi[puyo.puyo2y-1][4]!=0: 
+          puyo.migi_c+=1
+        elif field.haichi[puyo.puyo2y][5]==0:
+          if field.haichi[puyo.puyo2y-1][5]!=0: 
+            puyo.migi_c+=1
+          elif field.haichi[puyo.puyo2y-1][6]!=0 and field.haichi[puyo.puyo2y][6]==0:
+            puyo.migi_c+=1
+      elif field.haichi[puyo.puyo2y][2]!=0 and field.haichi[puyo.puyo2y][4]!=0:
+        puyo.kaiten_c=2
       else:
         return 0
 
@@ -1316,10 +1477,11 @@ class CPU():
           puyo.kaiten_c=1
         else:
           puyo.kaiten_c=2
-      elif field.haichi[puyo.puyo2y-1][2]!=0 and field.haichi[puyo.puyo2y][2]==0:
-        puyo.hidari_c+=1
-      elif field.haichi[puyo.puyo2y-1][1]!=0 and field.haichi[puyo.puyo2y][1]==0:
-        puyo.hidari_c+=1
+      elif field.haichi[puyo.puyo2y][2]==0:
+        if field.haichi[puyo.puyo2y-1][2]!=0: 
+          puyo.hidari_c+=1
+        elif field.haichi[puyo.puyo2y-1][1]!=0 and field.haichi[puyo.puyo2y][1]==0:
+          puyo.hidari_c+=1
       elif field.haichi[puyo.puyo2y][2]!=0 and field.haichi[puyo.puyo2y][4]!=0:
         puyo.kaiten_c=2
       else:
@@ -1356,10 +1518,11 @@ class CPU():
           puyo.kaiten_c=2
       elif field.haichi[puyo.puyo2y-1][4]!=0 and field.haichi[puyo.puyo2y][4]==0:
         puyo.migi_c+=1
-      elif field.haichi[puyo.puyo2y-1][2]!=0 and field.haichi[puyo.puyo2y][2]==0:
-        puyo.hidari_c+=1
-      elif field.haichi[puyo.puyo2y-1][1]!=0 and field.haichi[puyo.puyo2y][1]==0:
-        puyo.hidari_c+=1
+      elif field.haichi[puyo.puyo2y][2]==0:
+        if field.haichi[puyo.puyo2y-1][2]!=0: 
+          puyo.hidari_c+=1
+        elif field.haichi[puyo.puyo2y-1][1]!=0 and field.haichi[puyo.puyo2y][1]==0:
+          puyo.hidari_c+=1
       elif field.haichi[puyo.puyo2y][2]!=0 and field.haichi[puyo.puyo2y][4]!=0:
         puyo.kaiten_c=2
       else:
@@ -1391,14 +1554,16 @@ class CPU():
           puyo.kaiten_c=1
         else:
           puyo.kaiten_c=2
-      elif field.haichi[puyo.puyo2y-1][4]!=0 and field.haichi[puyo.puyo2y][4]==0:
-        puyo.migi_c+=1
-      elif field.haichi[puyo.puyo2y-1][5]!=0 and field.haichi[puyo.puyo2y][5]==0:
-        puyo.migi_c+=1
-      elif field.haichi[puyo.puyo2y-1][2]!=0 and field.haichi[puyo.puyo2y][2]==0:
-        puyo.hidari_c+=1
-      elif field.haichi[puyo.puyo2y-1][5]!=0 and field.haichi[puyo.puyo2y][5]==0:
-        puyo.hidari_c+=1
+      elif field.haichi[puyo.puyo2y][4]==0:
+        if field.haichi[puyo.puyo2y-1][4]!=0: 
+          puyo.migi_c+=1
+        elif field.haichi[puyo.puyo2y-1][5]!=0 and field.haichi[puyo.puyo2y][5]==0:
+          puyo.migi_c+=1
+      elif field.haichi[puyo.puyo2y][2]==0:
+        if field.haichi[puyo.puyo2y-1][2]!=0: 
+          puyo.hidari_c+=1
+        elif field.haichi[puyo.puyo2y-1][1]!=0 and field.haichi[puyo.puyo2y][1]==0:
+          puyo.hidari_c+=1
       elif field.haichi[puyo.puyo2y][2]!=0 and field.haichi[puyo.puyo2y][4]!=0:
         puyo.kaiten_c=2
       else:
