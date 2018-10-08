@@ -478,6 +478,7 @@ class AIField(Field):
     self.zenkeshihyouji=0
     self.rensa_c=0
     self.haichi_c=0
+    self.renketu_c=0
     return
 
   def rakka(self,y):
@@ -493,7 +494,6 @@ class AIField(Field):
       count2+=1
       if count==0:
         break
-      #time.sleep(0.2)
     return count2
   def rakka_chigiri(self,y):
     count2=0
@@ -508,7 +508,6 @@ class AIField(Field):
       count2+=1
       if count==0:
         break
-      #time.sleep(0.4)
     return count2
 
   def puyooki(self,puyo,x):
@@ -584,6 +583,7 @@ class AIField(Field):
   def renketusirabe(self):
     count3=0
     count4=0
+    count5=0
     y=jisakucopy.jisakucopy(self.haichi)
     for i in range(1,7):
       for j in range(1,13):
@@ -602,18 +602,22 @@ class AIField(Field):
               if self.haichi[l][k]==11:
                 self.haichi[l][k]=20
                 count4+=l**2
+                count5+=(k-3.5)**2
               elif self.haichi[l][k]==12:
                 self.haichi[l][k]=20
                 count4+=l**2
+                count5+=(k-3.5)**2
               elif self.haichi[l][k]==13:
                 self.haichi[l][k]=20
                 count4+=l**2
+                count5+=(k-3.5)**2
               elif self.haichi[l][k]==14:
                 self.haichi[l][k]=20
                 count4+=l**2
+                count5+=(k-3.5)**2
           count3=count3+self.count21**2+self.count22**2+self.count23**2+self.count24**2
     self.haichi=jisakucopy.jisakucopy(y)
-    return count3,count4
+    return count3,count4,int(count5)
 
 
   
@@ -735,7 +739,7 @@ class AIField(Field):
     self.count23=0
     self.count24=0
     self.renketu2(i,j)
-    if self.count21>=2 or self.count22>=2 or self.count23>=2 or self.count24>=2: 
+    if self.count21>=3 or self.count22>=3 or self.count23>=3 or self.count24>=3: 
       for k in range(1,7):
         for l in range(1,13):
           if self.haichi[l][k]==0:
@@ -755,6 +759,8 @@ class AIField(Field):
   
   def sokurensa(self):
     j=self.renketukeshi2()
+    if j>=4:
+      self.renketu_c+=j-4
     if j!=0:
       self.rensa_c+=1
     aa=self.rakka(14)
@@ -764,6 +770,7 @@ class AIField(Field):
   
   def rensashirabe(self):
     kekka_rensasuu=np.zeros((6,12),dtype=np.int)
+    self.renketu_c=0
     for i in range(1,7):
       for j in range(1,13):
         if self.haichi[j][i]==0:

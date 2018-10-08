@@ -1,3 +1,4 @@
+import numpy as np
 
 def jisakucopy(x):
   y=[[20,20,20,20,20,20,20,20],
@@ -19,4 +20,5 @@ def jisakucopy(x):
     for j in range(1,7):
       y[i][j]=x[i][j]
   return y
+
       
