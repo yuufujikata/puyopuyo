@@ -43,6 +43,10 @@ def main():
           start_c=6
         if event.key==K_g:
           start_c=7
+        if event.key==K_h:
+          start_c=8
+        if event.key==K_i:
+          start_c=9
     if start_c!=0:
       break
   if start_c==1:
@@ -68,7 +72,15 @@ def main():
   if start_c==7:
     com.start()
     karaplayer.start()
-
+  if start_c==8:
+    com_hidari.start()
+    ai_cpu3_hidari.start()
+    com_migi.start()
+    ai_cpu.start()
+  if start_c==9:
+    com_migi.start()
+    ai_cpu3_migi.start()
+    player1.start()
 
 class Gamen(threading.Thread):
   def __init__(self):
@@ -311,7 +323,7 @@ class COM_MIGI(threading.Thread):
         puyo_2.surinukecount+=1
         puyo_2.surinukecount2+=1
         puyo_2.kaiten_c=0
-        cpu.cpu_sousa_c=cpu.cpu_sousa(field2,puyo_2)
+        cpu2.cpu_sousa_c=cpu2.cpu_sousa(field2,puyo_2)
         puyo_2.yokoidou(field2)
         if puyo_2.shita_c>0:
           idou=puyo_2.idouhantei(field2,3)
@@ -429,39 +441,106 @@ class AI_CPU(threading.Thread):
     kirikae_c=0
     while True:
       if kirikae_c==0:
-        karifield=AIField(field1.haichi)
+        karifield=AIField(field2.haichi)
         karipuyo=AIPuyo()
-        karipuyo.syokika(puyo_1) 
-        karipuyo.puyooki(cpu.cpu_c)
+        karipuyo.syokika(puyo_2) 
+        karipuyo.puyooki(cpu2.cpu_c)
         karipuyo.rakka(karifield.haichi)
         karifield.sokurensa()
         imapuyo=AIPuyo()
-        imapuyo.puyo1iro=puyo_1.nexnex[0]
-        imapuyo.puyo2iro=puyo_1.nexnex[1]
-        if puyo_1.hajime_c==1:
+        imapuyo.puyo1iro=puyo_2.nexnex[0]
+        imapuyo.puyo2iro=puyo_2.nexnex[1]
+        if puyo_2.hajime_c==1:
           imapuyo.puyo1x=3
           imapuyo.puyo1y=13
           imapuyo.puyo2x=3
           imapuyo.puyo2y=12
         else:
-          imapuyo.puyo1x=puyo_1.puyo1x
-          imapuyo.puyo1y=puyo_1.puyo1y
-          imapuyo.puyo2x=puyo_1.puyo2x
-          imapuyo.puyo2y=puyo_1.puyo2y
-        t1=time.time()
-        sakiyomicpu_c=cpu.ai4(karifield.haichi,imapuyo)
-        t2=time.time()
-        print(t2-t1)
+          imapuyo.puyo1x=puyo_2.puyo1x
+          imapuyo.puyo1y=puyo_2.puyo1y
+          imapuyo.puyo2x=puyo_2.puyo2x
+          imapuyo.puyo2y=puyo_2.puyo2y
+#        t1=time.time()
+        sakiyomicpu_c=cpu2.ai4(karifield.haichi,imapuyo)
+#        t2=time.time()
+#        print(t2-t1)
         kirikae_c=1
       else:
-        if puyo_1.imapuyo_c==0:
-          cpu.cpu_c=sakiyomicpu_c
-          print(cpu.cpu_c)
+        if puyo_2.imapuyo_c==0:
+          cpu2.cpu_c=sakiyomicpu_c
+#          print(cpu2.cpu_c)
           kirikae_c=0
-          puyo_1.imapuyo_c=1
+          puyo_2.imapuyo_c=1
         time.sleep(0.001)
 
 class AI_CPU2(threading.Thread):
+  def __init__(self):
+    threading.Thread.__init__(self)
+    return
+  def run(self):
+    sakiyomicpu_c=0
+    kirikae_c=0
+    sousamati_c=0
+    while True:
+      if cpu2.cpu_sousa_c==0:
+        sousamati_c+=1
+      else:
+        sousamati_c=0
+      if sousamati_c>=30:
+        karifield=AIField(field2.haichi)
+        imapuyo=AIPuyo()
+        imapuyo.syokika(puyo_2)
+        imapuyo2=AIPuyo()
+        imapuyo2.puyo1iro=puyo_2.nexnex[0]
+        imapuyo2.puyo2iro=puyo_2.nexnex[1]
+        imapuyo2.puyo1x=3
+        imapuyo2.puyo1y=13
+        imapuyo2.puyo2x=3
+        imapuyo2.puyo2y=12
+        cpu2.cpu_c=cpu2.ai7(karifield.haichi,imapuyo,imapuyo2)
+        time.sleep(0.001)
+        sousamati_c=0
+         
+      if kirikae_c==0:
+        karifield=AIField(field2.haichi)
+        karipuyo=AIPuyo()
+        karipuyo.syokika(puyo_2) 
+        karipuyo.puyooki(cpu2.cpu_c)
+        karipuyo.rakka(karifield.haichi)
+        karifield.sokurensa()
+        imapuyo=AIPuyo()
+        imapuyo2=AIPuyo()
+        imapuyo.puyo1iro=puyo_2.nexnex[0]
+        imapuyo.puyo2iro=puyo_2.nexnex[1]
+        imapuyo2.puyo1iro=puyo_2.nexnex[2]
+        imapuyo2.puyo2iro=puyo_2.nexnex[3]
+        imapuyo.puyo1x=3
+        imapuyo.puyo1y=13
+        imapuyo.puyo2x=3
+        imapuyo.puyo2y=12
+        imapuyo2.puyo1x=3
+        imapuyo2.puyo1y=13
+        imapuyo2.puyo2x=3
+        imapuyo2.puyo2y=12
+#        t1=time.time()
+#        pr=Profile()
+#        pr.enable()
+        sakiyomicpu_c=cpu2.ai7(karifield.haichi,imapuyo,imapuyo2)
+#        pr.disable()
+#        pr.print_stats()
+#        t2=time.time()
+#        print(t2-t1)
+        kirikae_c=1
+        sousamati_c=0
+      else:
+        if puyo_2.imapuyo_c==0:
+          cpu2.cpu_c=sakiyomicpu_c
+#          print(cpu2.cpu_c)
+          kirikae_c=0
+          puyo_2.imapuyo_c=1
+        time.sleep(0.001)
+
+class AI_CPU3_hidari(threading.Thread):
   def __init__(self):
     threading.Thread.__init__(self)
     return
@@ -485,7 +564,7 @@ class AI_CPU2(threading.Thread):
         imapuyo2.puyo1y=13
         imapuyo2.puyo2x=3
         imapuyo2.puyo2y=12
-        cpu.cpu_c=cpu.ai7(karifield.haichi,imapuyo,imapuyo2)
+        cpu.cpu_c=cpu.ai8(karifield,field2,imapuyo,imapuyo2)
         time.sleep(0.001)
         sousamati_c=0
          
@@ -510,14 +589,14 @@ class AI_CPU2(threading.Thread):
         imapuyo2.puyo1y=13
         imapuyo2.puyo2x=3
         imapuyo2.puyo2y=12
-        t1=time.time()
+#        t1=time.time()
 #        pr=Profile()
 #        pr.enable()
-        sakiyomicpu_c=cpu.ai7(karifield.haichi,imapuyo,imapuyo2)
+        sakiyomicpu_c=cpu.ai8(karifield,field2,imapuyo,imapuyo2)
 #        pr.disable()
 #        pr.print_stats()
-        t2=time.time()
-        print(t2-t1)
+#        t2=time.time()
+#        print(t2-t1)
         kirikae_c=1
         sousamati_c=0
       else:
@@ -527,7 +606,73 @@ class AI_CPU2(threading.Thread):
           kirikae_c=0
           puyo_1.imapuyo_c=1
         time.sleep(0.001)
+
+class AI_CPU3_migi(threading.Thread):
+  def __init__(self):
+    threading.Thread.__init__(self)
+    return
+  def run(self):
+    sakiyomicpu_c=0
+    kirikae_c=0
+    sousamati_c=0
+    while True:
+      if cpu.cpu_sousa_c==0:
+        sousamati_c+=1
+      else:
         sousamati_c=0
+      if sousamati_c>=30:
+        karifield=AIField(field2.haichi)
+        imapuyo=AIPuyo()
+        imapuyo.syokika(puyo_2)
+        imapuyo2=AIPuyo()
+        imapuyo2.puyo1iro=puyo_2.nexnex[0]
+        imapuyo2.puyo2iro=puyo_2.nexnex[1]
+        imapuyo2.puyo1x=3
+        imapuyo2.puyo1y=13
+        imapuyo2.puyo2x=3
+        imapuyo2.puyo2y=12
+        cpu2.cpu_c=cpu2.ai8(karifield,field1,imapuyo,imapuyo2)
+        time.sleep(0.001)
+        sousamati_c=0
+         
+      if kirikae_c==0:
+        karifield=AIField(field2.haichi)
+        karipuyo=AIPuyo()
+        karipuyo.syokika(puyo_2) 
+        karipuyo.puyooki(cpu2.cpu_c)
+        karipuyo.rakka(karifield.haichi)
+        karifield.sokurensa()
+        imapuyo=AIPuyo()
+        imapuyo2=AIPuyo()
+        imapuyo.puyo1iro=puyo_2.nexnex[0]
+        imapuyo.puyo2iro=puyo_2.nexnex[1]
+        imapuyo2.puyo1iro=puyo_2.nexnex[2]
+        imapuyo2.puyo2iro=puyo_2.nexnex[3]
+        imapuyo.puyo1x=3
+        imapuyo.puyo1y=13
+        imapuyo.puyo2x=3
+        imapuyo.puyo2y=12
+        imapuyo2.puyo1x=3
+        imapuyo2.puyo1y=13
+        imapuyo2.puyo2x=3
+        imapuyo2.puyo2y=12
+#        t1=time.time()
+#        pr=Profile()
+#        pr.enable()
+        sakiyomicpu_c=cpu2.ai8(karifield,field1,imapuyo,imapuyo2)
+#        pr.disable()
+#        pr.print_stats()
+#        t2=time.time()
+#        print(t2-t1)
+        kirikae_c=1
+        sousamati_c=0
+      else:
+        if puyo_2.imapuyo_c==0:
+          cpu2.cpu_c=sakiyomicpu_c
+          print(cpu2.cpu_c)
+          kirikae_c=0
+          puyo_2.imapuyo_c=1
+        time.sleep(0.001)
 
 
 if __name__=='__main__':
@@ -549,8 +694,12 @@ if __name__=='__main__':
   com=COM()
   player2=Player2()
   karaplayer=Karaplayer()
+
+  #AI
   ai_cpu=AI_CPU()
   ai_cpu2=AI_CPU2()
+  ai_cpu3_migi=AI_CPU3_migi()
+  ai_cpu3_hidari=AI_CPU3_hidari()
   
   #hyouji
   gamen=Gamen()

@@ -105,7 +105,7 @@ class Field():
       count2+=1
       if count==0:
         break
-      time.sleep(0.2)
+      time.sleep(0.3)
     return count2
   
   def rakka_chigiri(self,y):
@@ -121,7 +121,7 @@ class Field():
       count2+=1
       if count==0:
         break
-      time.sleep(0.4)
+      time.sleep(0.2)
     return count2
   
   def sokurakka(self,y):
@@ -460,7 +460,7 @@ class Field():
         self.counttotal-=aitefield.counttotal_a
         aitefield.counttotal_a=0
     if j[0]!=0:
-      time.sleep(0.8)
+      time.sleep(1)
     aa=self.rakka(14)
     if aa==1:
       return 1

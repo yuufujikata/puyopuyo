@@ -49,7 +49,7 @@ def allhyouji(field1,field2,puyo_1,puyo_2,screen,font):
   pygame.display.update()
 
 def hyouji(x,screen):
-  for i in range(1,14):
+  for i in range(1,13):
     for j in range(1,7):
       if x[i][j]==1:
         s=50*(12.5-i)
@@ -82,7 +82,7 @@ def hyouji(x,screen):
         k=int(50*k)
         pygame.draw.circle(screen,(0,0,0),(k+10,s+50),25,3)
 def hyouji_2(x,screen):
-  for i in range(1,14):
+  for i in range(1,13):
     for j in range(1,7):
       if x[i][j]==1:
         s=50*(12.5-i)
